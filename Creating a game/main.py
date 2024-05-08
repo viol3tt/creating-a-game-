@@ -17,6 +17,8 @@ SCREEN_WIDTH = 800
 size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 screen = pygame.display.set_mode(size)
 title_screen = True
+current_time = 0
+elapsed_time = 0  # doesn't start until after title screen
 
 p = Plane(200, 350) #start at top left of screen
 
@@ -28,7 +30,7 @@ b = 247
 
 # render the text for later
 start_screen = start_font.render("Start Game", True, (0, 0, 0))
-#total_time = my_font.render("Elapsed Time: " + str(round(countdown, 2)) + "s", True, (255, 255, 255)) #set this up
+total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255)) #set this up
 
 # Instantiate
 
@@ -43,6 +45,11 @@ while run:
         p.move_plane("right")
     elif keys[pygame.K_a]:
         p.move_plane("left")
+    if title_screen:
+        elapsed_time = time.time() - current_time
+        total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True,
+                                    (255, 255, 255))  #maybe don't display but simply keep note of it and \
+        #after certain time different changes happen
 
     # --- Main event loop
     ## ----- NO BLIT ZONE START ----- ##
