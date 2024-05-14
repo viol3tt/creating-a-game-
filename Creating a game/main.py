@@ -7,13 +7,16 @@ from plane import Plane
 pygame.init()
 pygame.font.init()
 my_font = pygame.font.SysFont('Times', 15)
-start_font = pygame.font.SysFont('Times', 45)
+start_font = pygame.font.SysFont('Times', 95)
+
+bg = pygame.image.load("france background.jpg")
+
 
 
 # set up variables for the display
-SCREEN_HEIGHT = 400 #find an image for background, maybe it's day but like in future code could have an elapsed time
+SCREEN_HEIGHT = 846 #find an image for background, maybe it's day but like in future code could have an elapsed time
 #and at a certain point becomes night
-SCREEN_WIDTH = 800
+SCREEN_WIDTH = 1300
 size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 screen = pygame.display.set_mode(size)
 title_screen = True
@@ -24,12 +27,9 @@ p = Plane(200, 350) #start at top left of screen
 
 #bg = pygame.image.load("background.png") #will be interacted with? if yes needs a seperate class
 
-r = 203
-g = 237
-b = 247
 
 # render the text for later
-start_screen = start_font.render("Start Game", True, (0, 0, 0))
+start_screen = start_font.render("Start Game", True, (155, 125, 240))
 total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255)) #set this up
 
 # Instantiate
@@ -45,6 +45,7 @@ while run:
         p.move_plane("right")
     elif keys[pygame.K_a]:
         p.move_plane("left")
+
     if title_screen:
         elapsed_time = time.time() - current_time
         total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True,
@@ -64,10 +65,11 @@ while run:
     ##  ----- NO BLIT ZONE END  ----- ##
 
     ## FILL SCREEN, and BLIT here ##
-    #screen.blit(bg, (0, 0)) #when upload background image into the game
-    screen.fill((r, g, b))
+    screen.blit(bg, (0, 0)) #when upload background image into the game
     if title_screen:
-        screen.blit(start_screen, (200, 200)) #w, h
+        screen.blit(start_screen, (430, 350)) #w, h
+    if not title_screen:
+        screen.blit(p.image, p.rect)
     pygame.display.update()
     ## END OF WHILE LOOP
 
