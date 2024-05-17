@@ -17,9 +17,13 @@ class Bomb:
         self.image = pygame.transform.scale(self.image, scale_size)
 
     def move_bomb(self):
-        self.rect.by += self.speed_by  # Bomb falls downwards
+        self.rect.by += self.speed_by  # Bomb falls downwards//speed..
 
 
+##what does it do
+    def drop_bomb(self):
+        bomb = Bomb(self.rect.centerx, self.rect.bottom)
+        self.bombs.append(bomb)
 
 
 
