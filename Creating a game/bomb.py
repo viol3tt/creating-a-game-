@@ -17,13 +17,9 @@ class Bomb:
         self.image = pygame.transform.scale(self.image, scale_size)
 
     def move_bomb(self):
+        #  code it so it falls down a bit like 20/30 or whatever amount per second
+        # orr... is their a way to use frames for this maybe
         self.rect.by += self.speed_by  # Bomb falls downwards//speed..
-
-
-##what does it do
-    def drop_bomb(self):
-        bomb = Bomb(self.rect.centerx, self.rect.bottom)
-        self.bombs.append(bomb)
 
 
 
