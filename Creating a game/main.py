@@ -68,8 +68,7 @@ while run:
     #for i in range(red_number):
         #rx = random.randint(100, 900)
         #ry = random.randint(100, 650) #random location
-        #red_obj = Red(rx, ry)
-        #red_objects.append(red_obj)
+
     elapsed_time = time.time() - current_time
     elapsed_time = int(elapsed_time)
     total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255))
