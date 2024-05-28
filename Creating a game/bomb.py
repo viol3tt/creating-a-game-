@@ -4,12 +4,12 @@ import pygame
 
 class Bomb:
     def __init__(self, bx, by):
-        self.image_list = ["unnamed.png"]
+        self.image_list = ["bombv2.PNG"]
         self.image = pygame.image.load(self.image_list[0])
         self.rescale_image_bomb()
         self.image_size = self.image.get_size()
-        self.rect = self.image.get_rect(topleft=(bx, by))
-        self.speed_by = 5  # Speed at which the bomb falls
+        self.rect = pygame.Rect(bx, by, self.image_size[0], self.image_size[1])
+        self.speed_by = 10  # Speed at which the bomb falls
 
     def rescale_image_bomb(self):
         self.image_size = self.image.get_size()
@@ -19,7 +19,8 @@ class Bomb:
     def move_bomb(self):
         #  code it so it falls down a bit like 20/30 or whatever amount per second
         # orr... is their a way to use frames for this maybe
-        self.rect.by += self.speed_by  # Bomb falls downwards//speed..
+        self.rect.y += self.speed_by
+
 
 
 

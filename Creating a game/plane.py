@@ -19,9 +19,9 @@ class Plane:
 
     def move_plane(self, direction):
         if direction == "right":
-            self.px += .5  #//
+            self.px += 2.5  #//
         elif direction == "left":
-            self.px -= .5  #//
+            self.px -= 2.5  #//
 
         #...
         self.rect = pygame.Rect(self.px, self.py, self.image_size[0], self.image_size[1])

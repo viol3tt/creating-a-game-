@@ -4,6 +4,7 @@ import time
 from plane import Plane
 from bomb import Bomb
 from red import Red
+#from green import Green
 
 #set up pygame modules
 pygame.init()
@@ -17,21 +18,19 @@ SCREEN_WIDTH = 1000
 size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 screen = pygame.display.set_mode(size)
 title_screen = True
-drop_bomb = False #is this even neccessairy
 current_time = time.time()
 elapsed_time = 0  #doesn't start until after title screen
-red_number = 1 #variable set for how many duplicates
+red_number = 5 #variable set for how many duplicates
+score = 0
 red_objects = [] #will store multiple instances (red circles)
 
 #background(s)
 bg = pygame.image.load("river landscape.jpg")
-
+night_bg = pygame.image.load("france background.jpg") # why is it automattically going to this bg
+current_bg = bg
 
 p = Plane(25, 50) #start at top left of screen
-b = Bomb(50,500)#need to always set plane's location as a variable and bomb when button is clicked will appear right bellow
-
-
-#bg = pygame.image.load("background.png") #will be interacted with? if yes needs a seperate class
+b = Bomb(-100,-100)#bomb starts off screen until activated
 
 
 # render the text for later
@@ -39,14 +38,12 @@ start_screen = start_font.render("Start Game", True, (155, 125, 240))
 instructions = my_font.render("click b to drop bomb, a & d to move left right", True, (0, 0, 0))
 #display for now
 total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255))
-
-# Instantiate
-
+display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
 
 # The loop will carry on until the user exits the game (e.g. clicks the close button).
 run = True
 
-# -------- Main Program Loop -----------
+# -------- Main Program Loop ----------- #
 clock = pygame.time.Clock()
 frame = 60
 while run:
@@ -57,23 +54,41 @@ while run:
         p.move_plane("right")
     elif keys[pygame.K_a]:
         p.move_plane("left")
-    elif keys[pygame.K_b]:
-        drop_bomb = True
+    #activate bomb
+    if keys[pygame.K_b] and b.rect.top < 0:
+       b.rect.topleft = (p.rect.centerx, p.rect.bottom)  #bomb will be bellow the plane
+
+    if b.rect.top >= 0:
         b.move_bomb()
-        Bomb = Plane(px-5, py-5) #how would I get this to work...?
 
-    #if b.rect.colliderect(r.rect):
+    if len(red_objects) < red_number: #makes sure there's always set amount of red
+        rx = random.randint(100, 900)
+        ry = random.randint(100, 650) #random location
+        red_obj = Red(rx, ry)
+        red_objects.append(red_obj)
 
-#deal with later // causing error messages
-    #for i in range(red_number):
-        #rx = random.randint(100, 900)
-        #ry = random.randint(100, 650) #random location
+    for red_obj in red_objects:
+         red_obj.move()
+    if b.rect.bottom >= 750: #if bomb is off screen
+        b.rect.topleft = (-100, -100)
 
-    elapsed_time = time.time() - current_time
-    elapsed_time = int(elapsed_time)
+    #bomb collides w/ red  -->> PARTIALLY WORKING
+    if b.rect.colliderect(red_obj.rect):
+        for red_obj in red_objects:
+            red_objects.remove(red_obj.rect) #this code here something is wrong because it's not working
+            score += 10
+            display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
+            b.rect.topleft = (-100, -100)
+
+    elapsed_time = int(time.time() - current_time)
     total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255))
-    if elapsed_time == 10:  # night??
-        bg = ("france background.jpg")
+
+    #background change
+    if 20 >= elapsed_time >= 10: #need to generalize more, game could have a max time/ time limit and then determine
+        #night/day
+        current_bg = night_bg
+    else:
+        current_bg = bg
     ####################################################################
     for event in pygame.event.get():  # User did something
         print(event)
@@ -87,19 +102,20 @@ while run:
 
 
     ## FILL SCREEN, and BLIT here ##
-    screen.blit(bg, (0, 0)) #when upload background image into the game
-    #not working for changing background I'm not sure why
+    screen.blit(current_bg, (0, 0))
     if title_screen:
         screen.blit(start_screen, (430, 350)) #w, h
         screen.blit(instructions, (430, 400))
     if not title_screen:
         screen.blit(total_time, (20, 20)) #we will fix location/stuff later, main goal get game to work first!!
+        screen.blit(display_score, (30, 30))
         screen.blit(p.image, p.rect)
-        #screen.blit(r.image, r.rect) * red_number
-        if drop_bomb:
+        for red_obj in red_objects:
+            screen.blit(red_obj.image, red_obj.rect)
+        if b.rect.top >=0:
             screen.blit(b.image, b.rect)
     pygame.display.update()
-    ## END OF WHILE LOOP
+
 
 # Once we have exited the main program loop we can stop the game engine:
 pygame.quit()
