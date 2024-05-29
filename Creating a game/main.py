@@ -9,8 +9,8 @@ from red import Red
 #set up pygame modules
 pygame.init()
 pygame.font.init()
-my_font = pygame.font.SysFont('Times', 15)
-start_font = pygame.font.SysFont('Times', 95)
+my_font = pygame.font.SysFont('Comforta', 25)
+start_font = pygame.font.SysFont('Comforta', 95)
 
 # set up variables for the display
 SCREEN_HEIGHT = 750
@@ -21,12 +21,14 @@ title_screen = True
 current_time = time.time()
 elapsed_time = 0  #doesn't start until after title screen
 red_number = 5 #variable set for how many duplicates
+green_number = 5
 score = 0
 red_objects = [] #will store multiple instances (red circles)
+green_objects = []
 
 #background(s)
 bg = pygame.image.load("river landscape.jpg")
-night_bg = pygame.image.load("france background.jpg") # why is it automattically going to this bg
+night_bg = pygame.image.load("france background.jpg")
 current_bg = bg
 
 p = Plane(25, 50) #start at top left of screen
@@ -58,6 +60,7 @@ while run:
     if keys[pygame.K_b] and b.rect.top < 0:
        b.rect.topleft = (p.rect.centerx, p.rect.bottom)  #bomb will be bellow the plane
 
+#RED CIRCLE
     if b.rect.top >= 0:
         b.move_bomb()
 
@@ -73,13 +76,26 @@ while run:
         b.rect.topleft = (-100, -100)
 
     #bomb collides w/ red  -->> PARTIALLY WORKING
-    if b.rect.colliderect(red_obj.rect):
-        for red_obj in red_objects:
-            red_objects.remove(red_obj.rect) #this code here something is wrong because it's not working
-            score += 10
-            display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
-            b.rect.topleft = (-100, -100)
+    #what if... when collide change background color a bit or should I add an explosion image?
+    if b.rect.colliderect(red_obj): #error here, has to apply to ALL red objects
+        print("collide!")
+    for red_obj in red_objects:
+        red_objects.remove(red_obj)
+        score += 10
+        display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
+        b.rect.topleft = (-100, -100)
+#GREEN CIRCLE
+    if b.rect.top >= 0:
+        b.move_bomb()  #need twice...??
 
+    if len(green_objects) < green_number:  # makes sure there's always set amount of red
+        gx = random.randint(100, 900)
+        gy = random.randint(100, 650)  # random location
+        green_obj = Green(gx, gy)
+        green_objects.append(green_obj)
+#continue later
+
+#OTHER STUFF
     elapsed_time = int(time.time() - current_time)
     total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255))
 
@@ -104,11 +120,11 @@ while run:
     ## FILL SCREEN, and BLIT here ##
     screen.blit(current_bg, (0, 0))
     if title_screen:
-        screen.blit(start_screen, (430, 350)) #w, h
-        screen.blit(instructions, (430, 400))
+        screen.blit(start_screen, (320, 320)) #w, h
+        screen.blit(instructions, (315, 400))
     if not title_screen:
-        screen.blit(total_time, (20, 20)) #we will fix location/stuff later, main goal get game to work first!!
-        screen.blit(display_score, (30, 30))
+        screen.blit(total_time, (20, 20))
+        screen.blit(display_score, (20, 40))
         screen.blit(p.image, p.rect)
         for red_obj in red_objects:
             screen.blit(red_obj.image, red_obj.rect)
