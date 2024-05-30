@@ -1,6 +1,6 @@
 import pygame
 import random
-#class Green:
+class Green:
 #Once I get the red circle to work exactly as planned I will replicate the same code (mostly) with the green circles
     def __init__(self, gx, gy):
         self.pgx = gx
@@ -14,7 +14,7 @@ import random
 
     def rescale_image(self, image):  # works!!
         self.image_size = self.image.get_size()
-        scale_size = (int(self.image_size[0] * 0.05), int(self.image_size[1] * 0.05))  # Scale size should be integers
+        scale_size = (int(self.image_size[0] * 0.03), int(self.image_size[1] * 0.03))  # Scale size should be integers
         self.image = pygame.transform.scale(self.image, scale_size)
 
 

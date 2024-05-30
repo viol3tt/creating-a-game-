@@ -4,7 +4,7 @@ import time
 from plane import Plane
 from bomb import Bomb
 from red import Red
-#from green import Green
+from green import Green
 
 #set up pygame modules
 pygame.init()
@@ -18,6 +18,7 @@ SCREEN_WIDTH = 1000
 size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 screen = pygame.display.set_mode(size)
 title_screen = True
+end_screen = False
 current_time = time.time()
 elapsed_time = 0  #doesn't start until after title screen
 red_number = 5 #variable set for how many duplicates
@@ -41,6 +42,8 @@ instructions = my_font.render("click b to drop bomb, a & d to move left right", 
 #display for now
 total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255))
 display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
+display_gameover = start_font.render("Game Over!", True, (155, 125, 240))
+
 
 # The loop will carry on until the user exits the game (e.g. clicks the close button).
 run = True
@@ -61,7 +64,7 @@ while run:
        b.rect.topleft = (p.rect.centerx, p.rect.bottom)  #bomb will be bellow the plane
 
 #RED CIRCLE
-    if b.rect.top >= 0:
+    if b.rect.top >= 0: #bomb will move only when it's visible on the screen
         b.move_bomb()
 
     if len(red_objects) < red_number: #makes sure there's always set amount of red
@@ -71,29 +74,51 @@ while run:
         red_objects.append(red_obj)
 
     for red_obj in red_objects:
-         red_obj.move()
+         red_obj.move_red()
     if b.rect.bottom >= 750: #if bomb is off screen
         b.rect.topleft = (-100, -100)
 
-    #bomb collides w/ red  -->> PARTIALLY WORKING
+    #bomb collides w/red circle
+    collided_red_objects = []
     #what if... when collide change background color a bit or should I add an explosion image?
-    if b.rect.colliderect(red_obj): #error here, has to apply to ALL red objects
-        print("collide!")
     for red_obj in red_objects:
-        red_objects.remove(red_obj)
-        score += 10
-        display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
-        b.rect.topleft = (-100, -100)
-#GREEN CIRCLE
-    if b.rect.top >= 0:
-        b.move_bomb()  #need twice...??
+        if b.rect.colliderect(red_obj.rect):
+            print("collide!")
+            collided_red_objects.append(red_obj)
+            score += 10
+            display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
+            b.rect.topleft = (-100, -100)
 
-    if len(green_objects) < green_number:  # makes sure there's always set amount of red
+    for red_obj in collided_red_objects:
+        red_objects.remove(red_obj)
+
+#GREEN CIRCLE #add code to make sure green circle doesn't appear on red circle + maybe certain distance away
+    #if b.rect.top >= 0:
+        #b.move_bomb()  #need twice...??
+
+    if len(green_objects) < green_number:
         gx = random.randint(100, 900)
-        gy = random.randint(100, 650)  # random location
+        gy = random.randint(100, 650)
+        #if not gx == rx and not gy == ry #will have to somehow go through whole list
         green_obj = Green(gx, gy)
         green_objects.append(green_obj)
-#continue later
+
+    for green_obj in green_objects:
+        green_obj.move_green()
+    if b.rect.bottom >= 750:  # if bomb is off screen
+        b.rect.topleft = (-100, -100)
+
+    collided_green_objects = []
+    for green_obj in green_objects:
+        if b.rect.colliderect(green_obj.rect):
+            print("collide green!")
+            collided_green_objects.append(green_obj)
+            score -= 10
+            display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
+            b.rect.topleft = (-100, -100)
+
+    for green_obj in collided_green_objects:
+        green_objects.remove(green_obj)
 
 #OTHER STUFF
     elapsed_time = int(time.time() - current_time)
@@ -113,6 +138,8 @@ while run:
             elapsed_time = time.time() - current_time
             # after certain time different changes happen, background change??
             # at a certain point becomes night?
+            if elapsed_time == 5:
+                end_screen = True
         if event.type == pygame.QUIT:  #Closed the tab, game over
             run = False
 
@@ -126,10 +153,15 @@ while run:
         screen.blit(total_time, (20, 20))
         screen.blit(display_score, (20, 40))
         screen.blit(p.image, p.rect)
-        for red_obj in red_objects:
+        for red_obj in red_objects: #red circles
             screen.blit(red_obj.image, red_obj.rect)
+        for green_obj in green_objects: #green circles
+            screen.blit(green_obj.image, green_obj.rect)
         if b.rect.top >=0:
             screen.blit(b.image, b.rect)
+        elif end_screen:
+            screen.blit(display_gameover, (320, 320))
+            screen.blit(display_score, (20, 40))  # will this cause a problem??
     pygame.display.update()
 
 
