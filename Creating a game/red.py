@@ -16,8 +16,8 @@ class Red:
         self.image = pygame.transform.scale(self.image, scale_size)
 
     def move_red(self): #don't change numbers until you get collision w/ bomb to work
-        drx = random.randint(0, 0)
-        dry = random.randint(0, 0) #d for direction moving
+        drx = random.randint(-8, 8)
+        dry = random.randint(-8, 8) #d for direction moving
         self.prx += drx
         self.pry += dry
         self.rect = pygame.Rect(self.prx, self.pry, self.image_size[0], self.image_size[1])

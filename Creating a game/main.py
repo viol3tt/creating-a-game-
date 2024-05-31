@@ -50,9 +50,10 @@ run = True
 
 # -------- Main Program Loop ----------- #
 clock = pygame.time.Clock()
-frame = 60
+frame = 60 #should I remove or incorperate something with this
 while run:
     clock.tick(60)
+
 #commands with keys
     keys = pygame.key.get_pressed()
     if keys[pygame.K_d]:
@@ -76,14 +77,14 @@ while run:
     for red_obj in red_objects:
          red_obj.move_red()
     if b.rect.bottom >= 750: #if bomb is off screen
+        #add something for when circles become off screen
         b.rect.topleft = (-100, -100)
 
     #bomb collides w/red circle
     collided_red_objects = []
-    #what if... when collide change background color a bit or should I add an explosion image?
+    # when collide change background color a bit or should I add an explosion image
     for red_obj in red_objects:
         if b.rect.colliderect(red_obj.rect):
-            print("collide!")
             collided_red_objects.append(red_obj)
             score += 10
             display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
@@ -99,6 +100,11 @@ while run:
     if len(green_objects) < green_number:
         gx = random.randint(100, 900)
         gy = random.randint(100, 650)
+        #for rx in red_objects:
+            #if gx == rx[i]:
+                #gx = random.randint(100, 900)
+            #if gx == rx[i] (find code for like between a certain range of numbers)
+            #i = i + 1
         #if not gx == rx and not gy == ry #will have to somehow go through whole list
         green_obj = Green(gx, gy)
         green_objects.append(green_obj)
@@ -111,7 +117,6 @@ while run:
     collided_green_objects = []
     for green_obj in green_objects:
         if b.rect.colliderect(green_obj.rect):
-            print("collide green!")
             collided_green_objects.append(green_obj)
             score -= 10
             display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
@@ -123,7 +128,8 @@ while run:
 #OTHER STUFF
     elapsed_time = int(time.time() - current_time)
     total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255))
-
+    if int(elapsed_time) == 25:
+        end_screen = True
     #background change
     if 20 >= elapsed_time >= 10: #need to generalize more, game could have a max time/ time limit and then determine
         #night/day
@@ -136,10 +142,6 @@ while run:
         if event.type == pygame.MOUSEBUTTONDOWN and title_screen:  #disapear after being clicked once
             title_screen = False
             elapsed_time = time.time() - current_time
-            # after certain time different changes happen, background change??
-            # at a certain point becomes night?
-            if elapsed_time == 5:
-                end_screen = True
         if event.type == pygame.QUIT:  #Closed the tab, game over
             run = False
 
@@ -149,7 +151,7 @@ while run:
     if title_screen:
         screen.blit(start_screen, (320, 320)) #w, h
         screen.blit(instructions, (315, 400))
-    if not title_screen:
+    if not title_screen and not end_screen :
         screen.blit(total_time, (20, 20))
         screen.blit(display_score, (20, 40))
         screen.blit(p.image, p.rect)
@@ -159,7 +161,7 @@ while run:
             screen.blit(green_obj.image, green_obj.rect)
         if b.rect.top >=0:
             screen.blit(b.image, b.rect)
-        elif end_screen:
+        if end_screen:
             screen.blit(display_gameover, (320, 320))
             screen.blit(display_score, (20, 40))  # will this cause a problem??
     pygame.display.update()

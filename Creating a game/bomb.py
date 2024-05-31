@@ -22,5 +22,5 @@ class Bomb:
         self.rect.y += self.speed_by
 
 
-
+#could create set amount of bombs here, that can be used at once
 
