@@ -80,6 +80,11 @@ while run:
         #add something for when circles become off screen
         b.rect.topleft = (-100, -100)
 
+#a) when collide get the bomb to stop moving
+#b)explosion image will replace bomb image
+#c)appear/disapear quickly
+
+
     #bomb collides w/red circle
     collided_red_objects = []
     # when collide change background color a bit or should I add an explosion image
@@ -124,7 +129,7 @@ while run:
 
     for green_obj in collided_green_objects:
         green_objects.remove(green_obj)
-
+#make bomb stop and explode when hits circle
 #OTHER STUFF
     elapsed_time = int(time.time() - current_time)
     total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255))
@@ -151,7 +156,7 @@ while run:
     if title_screen:
         screen.blit(start_screen, (320, 320)) #w, h
         screen.blit(instructions, (315, 400))
-    if not title_screen and not end_screen :
+    if not title_screen and not end_screen : #end screen not appearing
         screen.blit(total_time, (20, 20))
         screen.blit(display_score, (20, 40))
         screen.blit(p.image, p.rect)

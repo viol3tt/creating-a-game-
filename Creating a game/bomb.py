@@ -4,7 +4,7 @@ import pygame
 
 class Bomb:
     def __init__(self, bx, by):
-        self.image_list = ["bombv2.PNG"]
+        self.image_list = ["bombv2.PNG", "explosion placeholder.png"]
         self.image = pygame.image.load(self.image_list[0])
         self.rescale_image_bomb()
         self.image_size = self.image.get_size()
@@ -19,8 +19,12 @@ class Bomb:
     def move_bomb(self):
         #  code it so it falls down a bit like 20/30 or whatever amount per second
         # orr... is their a way to use frames for this maybe
+        self.image = pygame.image.load(self.image_list[0])
         self.rect.y += self.speed_by
-
+        if b.rect.colliderect(red_obj.rect) or b.rect.colliderect(green_obj.rect):
+            self.image = pygame.image.load(self.image_list[1])
+            #add code make sure explosion image doesn't continue to move down the screen
+    #causing errors, don't know why b is not defined -> why??
 
 #could create set amount of bombs here, that can be used at once
 
