@@ -1,30 +1,34 @@
 import pygame
-
-import pygame
+import time
 
 class Bomb:
     def __init__(self, bx, by):
-        self.image_list = ["bombv2.PNG", "explosion placeholder.png"]
+        self.image_list = ["bombv2.PNG", "explode.png"]
         self.image = pygame.image.load(self.image_list[0])
         self.rescale_image_bomb()
         self.image_size = self.image.get_size()
         self.rect = pygame.Rect(bx, by, self.image_size[0], self.image_size[1])
         self.speed_by = 10  # Speed at which the bomb falls
+        self.exploded = False
 
     def rescale_image_bomb(self):
         self.image_size = self.image.get_size()
-        scale_size = (int(self.image_size[0] * 0.1), int(self.image_size[1] * 0.1))  # Scale size should be integers
+        scale_size = (int(self.image_size[0] * 0.1), int(self.image_size[1] * 0.1))
         self.image = pygame.transform.scale(self.image, scale_size)
-
     def move_bomb(self):
-        #  code it so it falls down a bit like 20/30 or whatever amount per second
-        # orr... is their a way to use frames for this maybe
-        self.image = pygame.image.load(self.image_list[0])
-        self.rect.y += self.speed_by
-        if b.rect.colliderect(red_obj.rect) or b.rect.colliderect(green_obj.rect):
-            self.image = pygame.image.load(self.image_list[1])
-            #add code make sure explosion image doesn't continue to move down the screen
-    #causing errors, don't know why b is not defined -> why??
+       if not self.exploded:
+            self.rect.y += self.speed_by
 
-#could create set amount of bombs here, that can be used at once
+    def explode(self, current_time):
+        self.image = pygame.image.load(self.image_list[1])  #explosion image!!!
+        self.rescale_image_bomb()
+        self.exploded = True
+        self.explosion_time = current_time  #storing bomb explosion time
+
+    def reset_bomb(self):
+        if self.exploded and (time.time() - self.explosion_time) >= 3:
+            self.exploded = False
+            self.image = pygame.image.load(self.image_list[0]) #go back to bomb image
+            self.rescale_image_bomb()
+            self.rect.topleft = (-100, -100)  #bomb goes off screen
 

@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+import pygame.mixer  #try to add sound
 from plane import Plane
 from bomb import Bomb
 from red import Red
@@ -13,7 +14,7 @@ my_font = pygame.font.SysFont('Comforta', 25)
 start_font = pygame.font.SysFont('Comforta', 95)
 
 # set up variables for the display
-SCREEN_HEIGHT = 750
+SCREEN_HEIGHT = 496
 SCREEN_WIDTH = 1000
 size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 screen = pygame.display.set_mode(size)
@@ -24,12 +25,16 @@ elapsed_time = 0  #doesn't start until after title screen
 red_number = 5 #variable set for how many duplicates
 green_number = 5
 score = 0
+bomb_time = 0
 red_objects = [] #will store multiple instances (red circles)
 green_objects = []
+pygame.mixer.init()
+bomb_sound = pygame.mixer.Sound("Explosion sound effect - bomb sound - boom sound.mp3")
+
 
 #background(s)
-bg = pygame.image.load("river landscape.jpg")
-night_bg = pygame.image.load("france background.jpg")
+bg = pygame.image.load("background test.jpg")
+night_bg = pygame.image.load("night background.PNG")
 current_bg = bg
 
 p = Plane(25, 50) #start at top left of screen
@@ -46,9 +51,8 @@ display_gameover = start_font.render("Game Over!", True, (155, 125, 240))
 
 
 # The loop will carry on until the user exits the game (e.g. clicks the close button).
-run = True
-
 # -------- Main Program Loop ----------- #
+run = True
 clock = pygame.time.Clock()
 frame = 60 #should I remove or incorperate something with this
 while run:
@@ -62,91 +66,77 @@ while run:
         p.move_plane("left")
     #activate bomb
     if keys[pygame.K_b] and b.rect.top < 0:
-       b.rect.topleft = (p.rect.centerx, p.rect.bottom)  #bomb will be bellow the plane
+       b.rect.topleft = (p.rect.centerx, p.rect.bottom) #bomb will be bellow the plane
+       bomb_sound.play()
 
-#RED CIRCLE
     if b.rect.top >= 0: #bomb will move only when it's visible on the screen
         b.move_bomb()
-
+# RED CIRCLE
     if len(red_objects) < red_number: #makes sure there's always set amount of red
         rx = random.randint(100, 900)
-        ry = random.randint(100, 650) #random location
+        ry = random.randint(100, 470) #random location
         red_obj = Red(rx, ry)
         red_objects.append(red_obj)
 
     for red_obj in red_objects:
          red_obj.move_red()
-    if b.rect.bottom >= 750: #if bomb is off screen
-        #add something for when circles become off screen
-        b.rect.topleft = (-100, -100)
-
-#a) when collide get the bomb to stop moving
-#b)explosion image will replace bomb image
-#c)appear/disapear quickly
-
+    if b.rect.bottom >= 900: #if bomb is off screen
+        b.reset_bomb()
 
     #bomb collides w/red circle
     collided_red_objects = []
-    # when collide change background color a bit or should I add an explosion image
     for red_obj in red_objects:
         if b.rect.colliderect(red_obj.rect):
             collided_red_objects.append(red_obj)
             score += 10
             display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
-            b.rect.topleft = (-100, -100)
+            b.explode(time.time()) #storing time of explosion
 
     for red_obj in collided_red_objects:
         red_objects.remove(red_obj)
 
-#GREEN CIRCLE #add code to make sure green circle doesn't appear on red circle + maybe certain distance away
-    #if b.rect.top >= 0:
-        #b.move_bomb()  #need twice...??
-
+#GREEN CIRCLE
     if len(green_objects) < green_number:
         gx = random.randint(100, 900)
-        gy = random.randint(100, 650)
-        #for rx in red_objects:
-            #if gx == rx[i]:
-                #gx = random.randint(100, 900)
-            #if gx == rx[i] (find code for like between a certain range of numbers)
-            #i = i + 1
-        #if not gx == rx and not gy == ry #will have to somehow go through whole list
+        gy = random.randint(100, 470)
         green_obj = Green(gx, gy)
         green_objects.append(green_obj)
 
     for green_obj in green_objects:
         green_obj.move_green()
-    if b.rect.bottom >= 750:  # if bomb is off screen
-        b.rect.topleft = (-100, -100)
-
+    if b.rect.bottom >= 1000:  # if bomb is off screen
+        b.reset_bomb()
     collided_green_objects = []
+
     for green_obj in green_objects:
         if b.rect.colliderect(green_obj.rect):
             collided_green_objects.append(green_obj)
             score -= 10
             display_score = my_font.render("Score: " + str(score) + " points", True, (0, 0, 0))
-            b.rect.topleft = (-100, -100)
+            b.explode(time.time())
 
     for green_obj in collided_green_objects:
         green_objects.remove(green_obj)
-#make bomb stop and explode when hits circle
+
 #OTHER STUFF
     elapsed_time = int(time.time() - current_time)
     total_time = my_font.render("Elapsed Time: " + str(round(elapsed_time, 2)) + "s", True, (255, 255, 255))
-    if int(elapsed_time) == 25:
+    if score < 0 or int(elapsed_time) >= 90:
         end_screen = True
     #background change
-    if 20 >= elapsed_time >= 10: #need to generalize more, game could have a max time/ time limit and then determine
-        #night/day
+    if 60 >= elapsed_time >= 30:
         current_bg = night_bg
     else:
         current_bg = bg
-    ####################################################################
+
+    if b.exploded and (time.time() - b.explosion_time) > 3: #time limit for explosion
+        b.reset_bomb()
+
     for event in pygame.event.get():  # User did something
         print(event)
         if event.type == pygame.MOUSEBUTTONDOWN and title_screen:  #disapear after being clicked once
             title_screen = False
-            elapsed_time = time.time() - current_time
+            elapsed_time = time.time()
         if event.type == pygame.QUIT:  #Closed the tab, game over
             run = False
 
@@ -164,17 +154,10 @@ while run:
             screen.blit(red_obj.image, red_obj.rect)
         for green_obj in green_objects: #green circles
             screen.blit(green_obj.image, green_obj.rect)
-        if b.rect.top >=0:
+        if b.rect.top >= 0: #if bomb is on the screen
             screen.blit(b.image, b.rect)
         if end_screen:
             screen.blit(display_gameover, (320, 320))
-            screen.blit(display_score, (20, 40))  # will this cause a problem??
+            screen.blit(display_score, (20, 40))
     pygame.display.update()
-
-
-# Once we have exited the main program loop we can stop the game engine:
-pygame.quit()
-
-
-
 
